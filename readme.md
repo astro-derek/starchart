@@ -10,4 +10,4 @@ The program uses data from the Tycho2 catalogue: <http://cdsarc.u-strasbg.fr/viz
 
 There are quite a few options which are documented in the program:
 
-   python chart.py -h
+`python chart.py -h`
