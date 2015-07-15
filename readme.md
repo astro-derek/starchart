@@ -14,3 +14,5 @@ the Revised New General Catalogue: http://www.klima-luft.de/steinicke/ngcic/rev2
 There are quite a few options which are documented in the program:
 
 `python chart.py --help`
+
+I have a version of the tycho2 catalogue here: <https://dl.dropboxusercontent.com/u/5315243/starchart/tycho2_abbr_new2.dat>
