@@ -88,10 +88,10 @@ def main(params):
     parser.add_argument('-d', '--dec', type=float, default=0, help='center of the chart in declination')
     parser.add_argument('-f', '--fov', type=float, default=5, help='fov for gnomonic projection')
     
-    parser.add_argument('-m', '--mag', type=float, default=7, help='lowest magnitude stars to chart')
-    parser.add_argument('-l', '--labelLimit', type=Decimal, default=5.5, help='only display labels on stars brighter than this')
+    parser.add_argument('-m', '--mag', type=float, default=9, help='lowest magnitude stars to chart')
+    parser.add_argument('-l', '--labelLimit', type=Decimal, default=6, help='only display labels on stars brighter than this')
     
-    parser.add_argument('-c', '--catalogue', default='data/tycho2_abbr_new.dat', help='catalogue to use for the query')
+    parser.add_argument('-c', '--catalogue', default='data/tycho2_abbr_new2.dat', help='catalogue to use for the query')
     parser.add_argument('-L', '--labels', action='store_false', default=True, help='draw labels on objects')
     parser.add_argument('-G', '--grid', action='store_false', default=True, help='draw coordinate grid')
     parser.add_argument('-B', '--borders', action='store_false', default=True, help='draw constellation border lines')
@@ -100,19 +100,19 @@ def main(params):
     
     parser.add_argument('-W', '--width', type=float, default=a4_width, help='width of the chart')
     parser.add_argument('-H', '--height', type=float, default=a4_height, help='height of the chart')
-    parser.add_argument('-S', '--scaleR', type=float, default=.5, help='scale factor for objects')
-    parser.add_argument('-F', '--factor', type=float, default=1, help='size multiplier for drawing chart')
+    parser.add_argument('-S', '--scaleR', type=float, default=1, help='scale factor for objects')
+    parser.add_argument('-F', '--factor', type=float, default=3, help='size multiplier for drawing chart')
     
     parser.add_argument('-q', '--query', default=None, help='query the data files')
     parser.add_argument('-p', '--process', default=False, action='store_true', help='quit query on first result')
     parser.add_argument('-n', '--ngc', default=False, action='store_true', help='only query ngc catalogue')
     parser.add_argument('-o', '--queryonly', default=True, action='store_false', help='draw the chart aswell - centered on the first result')
     
-    parser.add_argument('--ngc_max', type=float, default=12, help='limiting magnitude for ngc objects')
+    parser.add_argument('--ngc_max', type=float, default=9, help='limiting magnitude for ngc objects')
     parser.add_argument('--rmax', type=float, default=50, help='max distance of label from object')
-    parser.add_argument('--dpi', type=float, default=72, help='dots per inch for image')
+    parser.add_argument('--dpi', type=float, default=300, help='dots per inch for image')
     
-    parser.add_argument('--con_font', type=int, default=22, help='size of font used for constellation labels')
+    parser.add_argument('--con_font', type=int, default=18, help='size of font used for constellation labels')
     parser.add_argument('--bayer_font', type=int, default=14, help='size of font used for stars identified by bayer / flamsteed')
     parser.add_argument('--hip_font', type=int, default=12, help='size of font used for hipparchos ids')
     parser.add_argument('--ngc_font', type=int, default=12, help='size of font used for ngc object labels')
@@ -211,7 +211,7 @@ def query(args):
         line = row.split(',')
         count += 1
         
-        if str(line[0] + line[1]).upper() == args.query.upper() or str('|'.join(line[24:])).upper().find(args.query.upper()) != -1 or str(line[7]).upper() == args.query.upper():
+        if str(line[0] + line[1]).upper() == args.query.upper():# or str('|'.join(line[24:])).upper().find(args.query.upper()) != -1 or str(line[7]).upper() == args.query.upper():
             print '%s %s ' % (line[16], args.ngc_max)
             if line[16] and float(line[16]) <= args.ngc_max:
                 results.append(line)
@@ -262,12 +262,12 @@ def get_stars(args):
     return stars
     
 def parse_star(row, args):
-    try:
-        if not float(row[VMAG]) <= args.mag:
-            return None
-    except:
-        console('error on line: %s' % (row))
+    #try:
+    if not float(row[VMAG]) <= args.mag:
         return None
+    #except:
+    #    console('error on line: %s' % (row))
+    #    return None
         
     point = get_point(row, args)
     if point:
@@ -389,10 +389,10 @@ def drawNgc(chart, ngc, args):
         if row['mag'] <= args.ngc_max:
             ngccount += 1
             point = row['point']
-            x = point['x'] - 10 #* args.scaleR
-            y = point['y'] - 5 #* args.scaleR
-            x1 = point['x'] + 10 #* args.scaleR 
-            y1 = point['y'] + 5 #* args.scaleR
+            x = point['x'] - 10 * args.scaleR
+            y = point['y'] - 5 * args.scaleR
+            x1 = point['x'] + 10 * args.scaleR 
+            y1 = point['y'] + 5 * args.scaleR
             
             chart.ellipse((x, y, x1, y1), outline=black)
         counter += 1
@@ -413,9 +413,9 @@ def drawStars(chart, data, args):
         chart.ellipse((x, y, x1, y1), fill=black)
         chart.ellipse((x, y, x1, y1), outline=white)
         prox = row['prox']
-        if prox != '999':
+        if prox != '999' and m > 1:
             cy = y + ((y1 - y) / 2)
-            chart.line((x - (5*args.scaleR), cy, x1 + (5*args.scaleR), cy), fill=black)
+            chart.line((x - 1, cy, x1 + 1, cy), fill=black)
         counter += 1
         progress(counter, len(data))
         
@@ -427,7 +427,7 @@ def drawLabels(chart, image, ngc, data, args):
         name = row['name']
         font_family = row['font']
         
-        if name != '':
+        if name != '' and args.labels and row['mag'] <= args.labelLimit:
             r = float(calc_rad(row['mag'])) * args.scaleR
             point = find_free(point, name, font_family, image, r, row['hip'])
             if point:
@@ -443,7 +443,7 @@ def drawLabels(chart, image, ngc, data, args):
             name = row['name']
             font_family = row['font']
             if name != '':
-                point = find_free(point, name, font_family, image, 10, '')
+                point = find_free(point, name, font_family, image, 10 * args.scaleR, '')
                 if point:
                     chart.text((point['x'], point['y']), name, font=font_family, fill=black)
         counter += 1
@@ -670,7 +670,14 @@ def drawRaLines(draw, args):
 
     
 def get_coords(ra, dec, args, filter=True):
-    point = globals()[args.type](ra, dec, args.ra, args.dec, filter)
+    #point = globals()[args.type](ra, dec, args.ra, args.dec, filter)
+    point = None
+    if (args.type == 'stereo'):
+        point = stereo(ra, dec, args.ra, args.dec, filter)
+    elif (args.type == 'gnomonic'):
+        point = gnomonic(ra, dec, args.ra, args.dec, filter)
+    elif (args.type == 'polar'):
+        point = polar(ra, dec, args.ra, args.dec, filter)
     if point != None:
         transform(point, args)
     return point
@@ -707,18 +714,19 @@ def polar(ra, dec, base_ra, base_dec, filter):
     return {'x': x1, 'y': y1}
 
 def gnomonic(ra, dec, base_ra, base_dec, filter):
-    inside = ra < base_ra + cmax and ra > base_ra - cmax and dec > base_dec - args.fov and dec < base_dec + args.fov
-    if filter and not inside:
-        return None
+    #inside = ra < base_ra + cmax and ra > base_ra - cmax and dec > base_dec - args.fov and dec < base_dec + args.fov
+    #if filter and not inside:
+    #    return None
         
     lam = ra * 15 * rads
     chi = dec * rads
     lam0 = base_ra * 15 * rads
+    
     chi1 = base_dec * rads
     c = float(math.sin(chi) * math.sin(chi1) + math.cos(chi) * math.cos(chi1) * math.cos(lam - lam0))
     
-    #if filter and c < cmax:
-    #    return None
+    if filter and c < cmax:
+        return None
         
     x1 = math.cos(chi) * math.sin(lam - lam0) / math.cos(c * rads)
     y1 = ((math.cos(chi1) * math.sin(chi)) - (math.sin(chi1) * math.cos(chi) * math.cos(lam - lam0))) / math.cos(c * rads)
@@ -828,38 +836,34 @@ def fix(name):
     return name
     
 def calc_rad(mag):
-    if mag > 12:
+    if mag >= 12:
         return 1
-    if mag > 10:
+    if mag >= 10:
+        return 1
+    if mag >= 9:
+        return 1
+    if mag >= 8:
         return 2
-    if mag > 9:
-        return 3
-    if mag > 8:
-        return 4
-    if mag > 7:
-        return 5
-    if mag > 6:
-        return 6
+    if mag >= 7:
+        return 2
+    if mag >= 6:
+        return 2
     if mag >= 5:
-        return 7
+        return 2
     if mag >= 4:
-        return 8
+        return 3
     if mag >= 3:
-        return 9
+        return 3
     if mag >= 2:
-        return 10
+        return 3
     if mag >= 1:
-        return 11
+        return 5
     if mag >= 0:
-        return 12
+        return 5
     if mag >= -1:
-        return 13
+        return 7
     if mag >= -2:
-        return 15
-    if mag >= -12:
-        return 20
-    if mag <= -20:
-        return 30
+        return 7
 
 def get_ngc(args):
     rows = list()
