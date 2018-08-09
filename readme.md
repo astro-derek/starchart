@@ -5,6 +5,8 @@ Python program to generate star charts. Currently supports creating charts in th
 * gnomonic - for generating field of view type charts useful as finder charts.
 * polar - for generating a polar view.
 
+Note: This program works with python 2.7. You will need to install Pillow with `pip install Pillow`.
+
 see `generate_charts.bat` for sample script to generate low res 'index' charts and high res
 starmaps.
 
