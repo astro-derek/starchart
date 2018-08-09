@@ -17,6 +17,7 @@ There are quite a few options which are documented in the program:
 
 `python chart.py --help`
 
-I have a version of the tycho2 catalogue here: <https://www.dropbox.com/s/nqhqpko4163y1ft/tycho2_abbr_new2.dat?dl=0>
+I have a version of the tycho2 catalogue here: <https://www.dropbox.com/s/nqhqpko4163y1ft/tycho2_abbr_new2.dat?dl=0>. Download that and put it into the 
+`data` folder. It is too big to check into github :-)
 
 see `sample` folder for sample output for polar, gnomonic and stereo projections.
