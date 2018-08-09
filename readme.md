@@ -15,6 +15,6 @@ There are quite a few options which are documented in the program:
 
 `python chart.py --help`
 
-I have a version of the tycho2 catalogue here: <https://dl.dropboxusercontent.com/u/5315243/starchart/tycho2_abbr_new2.dat>
+I have a version of the tycho2 catalogue here: <https://www.dropbox.com/s/nqhqpko4163y1ft/tycho2_abbr_new2.dat?dl=0>
 
 see `sample` folder for sample output for polar, gnomonic and stereo projections.
