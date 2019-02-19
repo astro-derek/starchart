@@ -118,6 +118,10 @@ def main(params):
     parser.add_argument('--ngc_font', type=int, default=12, help='size of font used for ngc object labels')
     
     parser.add_argument('--out', type=argparse.FileType('wb'), default=None, help='filename for output')
+	
+    parser.add_argument('--figure_line_width', type=int, default=1, help='width for figure lines')
+    parser.add_argument('--con_line_width', type=int, default=1, help='width for border lines')
+    parser.add_argument('--ecliptic_line_width', type=int, default=1, help='width for ecliptic')
     
     global args, times, arial, arial_small, con_font
     
@@ -467,7 +471,7 @@ def drawEcliptic(chart, args):
             chart.ellipse((x, y, x1, y1), fill=red)
             
             if prev:
-                chart.line([(point['x'], point['y']), (prev['x'], prev['y'])], fill=red)
+                chart.line([(point['x'], point['y']), (prev['x'], prev['y'])], fill=red, width=args.ecliptic_line_width)
             
             prev = point
         
@@ -484,7 +488,7 @@ def drawBorders(draw, args):
         
         if coords and prev:
             if row['con'] == current:
-                draw.line([(prev['x'], prev['y']), (coords['x'], coords['y'])], fill=lightblue)
+                draw.line([(prev['x'], prev['y']), (coords['x'], coords['y'])], fill=lightblue, width=args.con_line_width)
             
         current = row['con']
         prev = coords
@@ -500,7 +504,7 @@ def drawFigures(draw, args):
         if start != None:
             end = get_coords(row['endRa'], row['endDec'], args, False)
             if end != None:
-                draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=lightgreen)
+                draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=lightgreen, width=args.figure_line_width)
         count += 1
         progress(count, len(lines))
 
