@@ -360,7 +360,10 @@ def draw(data, ngc, args):
     
     if args.figures:
         console('plotting constellation figures...')
-        drawFigures(chart, args)
+        if args.type == 'polar':
+            drawPolarFigures(chart, args)
+        elif args.type == 'stereo':
+		    drawRAFigures(chart, args)
     
     drawEcliptic(chart, args)
     
@@ -497,13 +500,27 @@ def drawBorders(draw, args):
         cur += 1
         progress(cur, count)
 
-def drawFigures(draw, args):
+def drawPolarFigures(draw, args):
     current = ''
     lines = get_figures()
     count = 0
     for row in lines:
         start = get_coords(row['startRa'], row['startDec'], args)
         if row['startDec'] > -60 and row['endDec'] > -60:
+            if start != None:
+                end = get_coords(row['endRa'], row['endDec'], args)
+                if end != None:
+                    draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=lightgreen, width=args.figure_line_width)
+            count += 1
+            progress(count, len(lines))
+
+def drawRAFigures(draw, args):
+    current = ''
+    lines = get_figures()
+    count = 0
+    for row in lines:
+        start = get_coords(row['startRa'], row['startDec'], args)
+        if row['startRa'] > args.ra-3 and row['endRa'] < args.ra+3:
             if start != None:
                 end = get_coords(row['endRa'], row['endDec'], args)
                 if end != None:
