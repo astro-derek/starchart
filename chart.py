@@ -64,9 +64,9 @@ gainsboro = (220,220,220,255)
 gray = (128,128,128,255)
 white = 'white'
 black = 'black'
-red = 'red'
-lightblue = (173, 216, 230, 255)
-lightgreen = (144, 238, 144, 255)
+red = (116,255,255,255)
+lightblue = (190,150,30,255)
+lightgreen = (221,116,221,255)
     
 rads = float(math.pi / 180)
 
@@ -447,9 +447,9 @@ def drawLabels(chart, image, ngc, data, args):
             name = row['name']
             font_family = row['font']
             if name != '':
-                point = find_free(point, name, font_family, image, 10 * args.scaleR, '')
+                # point = find_free(point, name, font_family, image, 10 * args.scaleR, '')
                 if point:
-                    chart.text((point['x'], point['y']), name, font=font_family, fill=black)
+                    chart.text((point['x'], point['y']+9), name, font=font_family, fill=black)
         counter += 1
         progress(counter, len(ngc))
         
@@ -841,15 +841,15 @@ def fix(name):
     
 def calc_rad(mag):
     if mag >= 12:
-        return 1
+        return .5
     if mag >= 10:
-        return 1
+        return .5
     if mag >= 9:
-        return 1
+        return .5
     if mag >= 8:
-        return 2
+        return 1
     if mag >= 7:
-        return 2
+        return 1
     if mag >= 6:
         return 2
     if mag >= 5:
@@ -863,11 +863,11 @@ def calc_rad(mag):
     if mag >= 1:
         return 5
     if mag >= 0:
-        return 5
+        return 6
     if mag >= -1:
-        return 7
+        return 8
     if mag >= -2:
-        return 7
+        return 10
 
 def get_ngc(args):
     rows = list()
