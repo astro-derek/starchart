@@ -67,7 +67,7 @@ black = 'black'
 red = (116,255,255,255)
 lightblue = (190,150,30,255)
 lightgreen = (221,116,221,255)
-    
+orange = (34, 108, 207, 255)
 rads = float(math.pi / 180)
 
 
@@ -105,6 +105,7 @@ def main(params):
     
     parser.add_argument('-q', '--query', default=None, help='query the data files')
     parser.add_argument('-p', '--process', default=False, action='store_true', help='quit query on first result')
+    parser.add_argument('-ff', '--filter', default=False, action='store_true', help='filter stars outside the bounds')
     parser.add_argument('-n', '--ngc', default=False, action='store_true', help='only query ngc catalogue')
     parser.add_argument('-o', '--queryonly', default=True, action='store_false', help='draw the chart aswell - centered on the first result')
     
@@ -279,6 +280,7 @@ def parse_star(row, args):
         name = ''
         mag = float(row[VMAG])
         font = times
+        con = ''
         if args.labels:
             if id != None:
                 id = id.strip()
@@ -338,7 +340,7 @@ def get_names():
     return names
     
 def draw(data, ngc, args):
-    image = Image.new('RGBA', (math.trunc(args.width * args.factor), math.trunc(args.height * args.factor)), white)
+    image = Image.new('RGBA', (math.trunc(args.width), math.trunc(args.height)), white)
     
     chart = ImageDraw.Draw(image)
     w,h = image.size
@@ -373,11 +375,11 @@ def draw(data, ngc, args):
     drawStars(chart, data, args)
         
     if args.type == 'polar':
-        point = get_coords(args.ra - 12, args.dec - 1, args, False)
-        point2 = get_coords(args.ra, args.dec -1, args, False)
+        point = get_coords(args.ra - 12, args.dec - 1, args)
+        point2 = get_coords(args.ra, args.dec -1, args)
         chart.line([(point['x'], point['y']), (point['x'], point2['y'])], fill=gray)
-        point = get_coords(args.ra - 6, args.dec - 1, args, False)
-        point2 = get_coords(args.ra + 6, args.dec -1, args, False)
+        point = get_coords(args.ra - 6, args.dec - 1, args)
+        point2 = get_coords(args.ra + 6, args.dec -1, args)
         chart.line([(point['x'], point['y']), (point2['x'], point['y'])], fill=gray)
     
     if args.labels:
@@ -501,12 +503,13 @@ def drawFigures(draw, args):
     count = 0
     for row in lines:
         start = get_coords(row['startRa'], row['startDec'], args)
-        if start != None:
-            end = get_coords(row['endRa'], row['endDec'], args, False)
-            if end != None:
-                draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=lightgreen, width=args.figure_line_width)
-        count += 1
-        progress(count, len(lines))
+        if row['startDec'] > -60 and row['endDec'] > -60:
+            if start != None:
+                end = get_coords(row['endRa'], row['endDec'], args)
+                if end != None:
+                    draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=lightgreen, width=args.figure_line_width)
+            count += 1
+            progress(count, len(lines))
 
 #def drawFigures2(draw, args):
 #    current = ''
@@ -534,7 +537,7 @@ def drawNames(draw, args):
     for name in names:
         coords = get_coords(name['ra'], name['dec'], args)
         if coords:
-            draw.text((coords['x'], coords['y']), name['name'], font=con_font, fill=lightblue)
+            draw.text((coords['x'], coords['y']), name['name'], font=con_font, fill=orange)
         count += 1
         progress(count, len(names))
 
@@ -560,7 +563,7 @@ def drawDeclinationLines(draw, args):
         label_step = 12
     elif args.type == 'polar':
         if args.dec == 90:
-            dec = 50
+            dec = -60
             end = 81
         elif args.dec == -90:
             dec = -80
@@ -580,7 +583,7 @@ def drawDeclinationLines(draw, args):
         while r <= endra:
             
             #console("ra: %s dec: %s                      %s" % (ra, de, ONE_TWELFTH))
-            point = get_coords(r, de, args, False)
+            point = get_coords(r, de, args)
             if point and prev:
                 draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray)
                 
@@ -599,8 +602,8 @@ def drawDeclinationLines(draw, args):
         r = ra
         prev = None
         while r <= endra:
-            point = get_coords(r - .025, de, args, False)
-            point2 = get_coords(r + .025, de, args, False)
+            point = get_coords(r - .025, de, args)
+            point2 = get_coords(r + .025, de, args)
             if point and point2 and prev:
                 draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray)
                 
@@ -615,7 +618,7 @@ def drawRaLines(draw, args):
     prev = None
     counter = 0
     ra = 0
-    end = Decimal(24)
+    end = Decimal(23)
     step = Decimal('0.2')
     label_step = 10
     
@@ -632,7 +635,7 @@ def drawRaLines(draw, args):
         label_step = 1
     elif args.type == 'polar':
         if args.dec == 90:
-            sdec = Decimal(50)
+            sdec = Decimal(-60)
             edec = Decimal(81)
         elif args.dec == -90:
             sdec = Decimal(-80)
@@ -644,7 +647,7 @@ def drawRaLines(draw, args):
     while r <= end:
         prev = None
         for de in range(sdec, edec, 1):
-            point = get_coords(float(r), float(de), args, False)
+            point = get_coords(float(r), float(de), args)
             if point and prev:
                 draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray)
                 if de % label_step == 0:
@@ -661,8 +664,8 @@ def drawRaLines(draw, args):
     while r <= end:
         #prev = None
         for de in range(sdec, edec, 10):
-            point = get_coords(float(r), float(de - step), args, False)
-            point2 = get_coords(float(r), float(de + step), args, False)
+            point = get_coords(float(r), float(de - step), args)
+            point2 = get_coords(float(r), float(de + step), args)
             if point and point2:
                 draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray)
             #prev = point2
@@ -673,15 +676,15 @@ def drawRaLines(draw, args):
     return
 
     
-def get_coords(ra, dec, args, filter=True):
+def get_coords(ra, dec, args):
     #point = globals()[args.type](ra, dec, args.ra, args.dec, filter)
     point = None
     if (args.type == 'stereo'):
-        point = stereo(ra, dec, args.ra, args.dec, filter)
+        point = stereo(ra, dec, args.ra, args.dec, args.filter)
     elif (args.type == 'gnomonic'):
-        point = gnomonic(ra, dec, args.ra, args.dec, filter)
+        point = gnomonic(ra, dec, args.ra, args.dec, args.filter)
     elif (args.type == 'polar'):
-        point = polar(ra, dec, args.ra, args.dec, filter)
+        point = polar(ra, dec, args.ra, args.dec, args.filter)
     if point != None:
         transform(point, args)
     return point
@@ -706,7 +709,7 @@ def stereo(r, d, ra, dec, filter):
     
 def polar(ra, dec, base_ra, base_dec, filter):
     if filter:
-        if (base_dec == 90 and dec < 50) or (base_dec == -90 and dec > -50):
+        if (base_dec == 90 and dec < -60) or (base_dec == -90 and dec > -50):
             return None
         
     r = float(ra) * rads * 15
@@ -751,8 +754,8 @@ def transform_polar(point, args):
     x = point['x']
     y = point['y']
     
-    point['x'] = (x * args.width / float(2) * args.factor) + (args.width * args.factor / 2)
-    point['y'] = (y * args.width / float(2) * args.factor) + (args.height * args.factor / 2)
+    point['x'] = (x * args.width * args.factor) + (args.width  / 2)
+    point['y'] = (y * args.width * args.factor) + (args.height / 2)
     
 def transform_gnomonic(point, args):
     x = point['x']
