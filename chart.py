@@ -123,6 +123,7 @@ def main(params):
     parser.add_argument('--figure_line_width', type=int, default=1, help='width for figure lines')
     parser.add_argument('--con_line_width', type=int, default=1, help='width for border lines')
     parser.add_argument('--ecliptic_line_width', type=int, default=1, help='width for ecliptic')
+    parser.add_argument('--tick_width', type=int, default=1, help='width for tick lines')
     
     global args, times, arial, arial_small, con_font
     
@@ -380,10 +381,10 @@ def draw(data, ngc, args):
     if args.type == 'polar':
         point = get_coords(args.ra - 12, args.dec - 1, args)
         point2 = get_coords(args.ra, args.dec -1, args)
-        chart.line([(point['x'], point['y']), (point['x'], point2['y'])], fill=gray)
+        chart.line([(point['x'], point['y']), (point['x'], point2['y'])], fill=gray, width=args.tick_width)
         point = get_coords(args.ra - 6, args.dec - 1, args)
         point2 = get_coords(args.ra + 6, args.dec -1, args)
-        chart.line([(point['x'], point['y']), (point2['x'], point['y'])], fill=gray)
+        chart.line([(point['x'], point['y']), (point2['x'], point['y'])], fill=gray, width=args.tick_width)
     
     if args.labels:
         drawLabels(chart, image, ngc, data, args)
@@ -462,7 +463,7 @@ def drawEcliptic(chart, args):
     coseps = math.cos(rads*23.439)
     sineps = math.sin(rads*23.439)
     prev = None
-    for d in range(0, 360):
+    for d in range(0, 361):
         i = float(d) / 15
         delta = math.asin(sineps * math.sin(i*rads*15))*(180/math.pi)
         point = get_coords(i, delta, args)
@@ -602,13 +603,13 @@ def drawDeclinationLines(draw, args):
             #console("ra: %s dec: %s                      %s" % (ra, de, ONE_TWELFTH))
             point = get_coords(r, de, args)
             if point and prev:
-                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray)
+                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray, width=args.tick_width)
                 
             
             if ctr % label_step == 0:
                 rh = round(r, 0)
                 #rm = round(60 * (r - math.trunc(r)))
-                draw.text((point['x'] - 20, point['y'] - 15), u'%sh' % (rh), font=arial, fill=gray)
+                draw.text((point['x'] - 20, point['y'] - 15), u'%sh' % (rh), font=arial, fill=gray, width=args.tick_width)
             r += float(ONE_TWELFTH)
             ctr += 1
             prev = point
@@ -622,7 +623,7 @@ def drawDeclinationLines(draw, args):
             point = get_coords(r - .025, de, args)
             point2 = get_coords(r + .025, de, args)
             if point and point2 and prev:
-                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray)
+                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray, width=args.tick_width)
                 
             prev = point2
             r += 1
@@ -666,11 +667,11 @@ def drawRaLines(draw, args):
         for de in range(sdec, edec, 1):
             point = get_coords(float(r), float(de), args)
             if point and prev:
-                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray)
+                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray, width=args.tick_width)
                 if de % label_step == 0:
                     rh = math.trunc(r)
                     rm = math.trunc(60 * (r - math.trunc(r)))
-                    draw.text((point['x'] + 10, point['y'] + 10), u'%s\u00b0' % (de), font=arial, fill=gray)
+                    draw.text((point['x'] + 10, point['y'] + 10), u'%s\u00b0' % (de), font=arial, fill=gray, width=args.tick_width)
             prev = point
         counter += 1
         r += Decimal(1)
@@ -684,7 +685,7 @@ def drawRaLines(draw, args):
             point = get_coords(float(r), float(de - step), args)
             point2 = get_coords(float(r), float(de + step), args)
             if point and point2:
-                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray)
+                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray, width=args.tick_width)
             #prev = point2
         counter += 1
         r += ONE_TWELFTH
