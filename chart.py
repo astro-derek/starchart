@@ -196,7 +196,7 @@ def query(args):
     
     if not args.ngc:
         console('searching tycho for %s' % (args.query))
-        tycho = open(args.catalogue)
+        # tycho = open(args.catalogue) 
         count = 0
         for row in tycho:
             line = row.split('|')
@@ -242,7 +242,7 @@ def create_chart(args):
     ngc = get_ngc(args)
     
     console('executing query...')
-    stars = get_stars(args)
+    stars = list() # get_stars(args)
     
     console('drawing chart...')
     image = draw(stars, ngc, args)
