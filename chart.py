@@ -68,6 +68,8 @@ red = (116,255,255,255)
 lightblue = (190,150,30,255)
 lightgreen = (221,116,221,255)
 orange = (34, 108, 207, 255)
+label = (139, 167, 214, 255) // invert this!
+
 rads = float(math.pi / 180)
 
 
@@ -440,7 +442,7 @@ def drawLabels(chart, image, ngc, data, args):
             r = float(calc_rad(row['mag'])) * args.scaleR
             point = find_free(point, name, font_family, image, r, row['hip'])
             if point:
-                chart.text((point['x'], point['y']), name, font=font_family, fill=black)
+                chart.text((point['x'], point['y']), name, font=font_family, fill=label)
         counter += 1
         progress(counter, len(data))
     
