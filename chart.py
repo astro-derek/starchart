@@ -58,7 +58,7 @@ ome = re.compile(r'.*Ome')
 c_prog = 0
 fifteen = float(15)
 scale = float('.75')
-cmax = 0.0;
+cmax = 0.0
 
 gainsboro = (220,220,220,255)
 gray = (128,128,128,255)
@@ -68,7 +68,7 @@ red = (116,255,255,255)
 lightblue = (190,150,30,255)
 lightgreen = (221,116,221,255)
 orange = (34, 108, 207, 255)
-label = (139, 167, 214, 255) // invert this!
+label = (43, 25, 8, 255) 
 
 rads = float(math.pi / 180)
 
@@ -77,6 +77,7 @@ times = None
 arial = None
 arial_small = None
 con_font = None
+roboto = None
 
 doubles = list()
 
@@ -139,7 +140,7 @@ def main(params):
     times = ImageFont.truetype("C:/Windows/Fonts/times.ttf", args.bayer_font)
     arial = ImageFont.truetype("C:/Windows/Fonts/arial.ttf", args.hip_font)
     arial_small = ImageFont.truetype("C:/Windows/Fonts/arial.ttf", args.ngc_font)
-    con_font = ImageFont.truetype("C:/Windows/Fonts/arial.ttf", args.con_font)
+    con_font = ImageFont.truetype("RobotoMono-Regular.ttf", args.con_font)
     
     if args.query != None:
         result = run_query(args)
@@ -398,7 +399,7 @@ def drawNgc(chart, ngc, args):
     ngccount = 0
     counter = 0
     for row in ngc:
-        if row['mag'] <= args.ngc_max:
+        if row['mag'] <= args.ngc_max or row['name'].startswith('M'):
             ngccount += 1
             point = row['point']
             x = point['x'] - 10 * args.scaleR
@@ -450,14 +451,14 @@ def drawLabels(chart, image, ngc, data, args):
     console('writing ngc labels...')
     counter = 0
     for row in ngc:
-        if row['mag'] <= args.ngc_max:
+        if row['mag'] <= args.ngc_max or row['name'].startswith('M'):
             point = row['point']
             name = row['name']
             font_family = row['font']
             if name != '':
                 # point = find_free(point, name, font_family, image, 10 * args.scaleR, '')
                 if point:
-                    chart.text((point['x'], point['y']+9), name, font=font_family, fill=black)
+                    chart.text((point['x'], point['y']+9), name, font=font_family, fill=label)
         counter += 1
         progress(counter, len(ngc))
         
@@ -611,7 +612,7 @@ def drawDeclinationLines(draw, args):
             if ctr % label_step == 0:
                 rh = round(r, 0)
                 #rm = round(60 * (r - math.trunc(r)))
-                draw.text((point['x'] - 20, point['y'] - 15), u'%sh' % (rh), font=arial, fill=gray, width=args.tick_width)
+                draw.text((point['x'] + 10, point['y'] - 35), u'%sh' % (rh), font=arial, fill=gray, width=args.tick_width)
             r += float(ONE_TWELFTH)
             ctr += 1
             prev = point
@@ -815,13 +816,15 @@ def find_free(point, text, font, image, r, hip):
                     
                     pixel = image.getpixel((x1, y1))
                     
-                    if pixel[0] == 0 and pixel[1] == 0 and pixel[2] == 0 and pixel[3] == 0:
-                        free = True
-                    elif (pixel[0] != 0 or pixel[1] != 0 or pixel[2] != 0) and pixel[3] != 0:
+                    if pixel[0] == label[0] and pixel[1] == label[1] and pixel[2] == label[2] and pixel[3] == label[3]: # labels
+                        free = False
+                        break
+                    elif (pixel[0] != 0 or pixel[1] != 0 or pixel[2] != 0) and pixel[3] != 0: # not black
                         free = True
                     else:
                         free = False
                         break
+                    
                 if not free:
                     break
             if free:
@@ -880,13 +883,13 @@ def calc_rad(mag):
     if mag >= 4:
         return 3
     if mag >= 3:
-        return 3
+        return 4
     if mag >= 2:
-        return 3
-    if mag >= 1:
         return 5
-    if mag >= 0:
+    if mag >= 1:
         return 6
+    if mag >= 0:
+        return 7
     if mag >= -1:
         return 8
     if mag >= -2:
