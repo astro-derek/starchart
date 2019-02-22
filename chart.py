@@ -61,14 +61,14 @@ scale = float('.75')
 cmax = 0.0
 
 gainsboro = (220,220,220,255)
-gray = (128,128,128,255)
+coordinates = (128,128,128,255)
 white = 'white'
 black = 'black'
 red = (116,255,255,255)
-lightblue = (190,150,30,255)
-lightgreen = (221,116,221,255)
+borders = (191,211,125,255)
+constellations = (105, 155, 216, 255)
 orange = (34, 108, 207, 255)
-label = (43, 25, 8, 255) 
+label = (191, 161, 131, 255) 
 
 rads = float(math.pi / 180)
 
@@ -384,10 +384,10 @@ def draw(data, ngc, args):
     if args.type == 'polar':
         point = get_coords(args.ra - 12, args.dec - 1, args)
         point2 = get_coords(args.ra, args.dec -1, args)
-        chart.line([(point['x'], point['y']), (point['x'], point2['y'])], fill=gray, width=args.tick_width)
+        chart.line([(point['x'], point['y']), (point['x'], point2['y'])], fill=coordinates, width=args.tick_width)
         point = get_coords(args.ra - 6, args.dec - 1, args)
         point2 = get_coords(args.ra + 6, args.dec -1, args)
-        chart.line([(point['x'], point['y']), (point2['x'], point['y'])], fill=gray, width=args.tick_width)
+        chart.line([(point['x'], point['y']), (point2['x'], point['y'])], fill=coordinates, width=args.tick_width)
     
     if args.labels:
         drawLabels(chart, image, ngc, data, args)
@@ -497,7 +497,7 @@ def drawBorders(draw, args):
         
         if coords and prev:
             if row['con'] == current:
-                draw.line([(prev['x'], prev['y']), (coords['x'], coords['y'])], fill=lightblue, width=args.con_line_width)
+                draw.line([(prev['x'], prev['y']), (coords['x'], coords['y'])], fill=borders, width=args.con_line_width)
             
         current = row['con']
         prev = coords
@@ -514,7 +514,7 @@ def drawPolarFigures(draw, args):
             if start != None:
                 end = get_coords(row['endRa'], row['endDec'], args)
                 if end != None:
-                    draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=lightgreen, width=args.figure_line_width)
+                    draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=constellations, width=args.figure_line_width)
             count += 1
             progress(count, len(lines))
 
@@ -528,7 +528,7 @@ def drawRAFigures(draw, args):
             if start != None:
                 end = get_coords(row['endRa'], row['endDec'], args)
                 if end != None:
-                    draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=lightgreen, width=args.figure_line_width)
+                    draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=constellations, width=args.figure_line_width)
             count += 1
             progress(count, len(lines))
 
@@ -606,13 +606,13 @@ def drawDeclinationLines(draw, args):
             #console("ra: %s dec: %s                      %s" % (ra, de, ONE_TWELFTH))
             point = get_coords(r, de, args)
             if point and prev:
-                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray, width=args.tick_width)
+                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=coordinates, width=args.tick_width)
                 
             
             if ctr % label_step == 0:
                 rh = round(r, 0)
                 #rm = round(60 * (r - math.trunc(r)))
-                draw.text((point['x'] + 10, point['y'] - 35), u'%sh' % (rh), font=arial, fill=gray, width=args.tick_width)
+                draw.text((point['x'] + 10, point['y'] - 35), u'%sh' % (rh), font=arial, fill=coordinates, width=args.tick_width)
             r += float(ONE_TWELFTH)
             ctr += 1
             prev = point
@@ -626,7 +626,7 @@ def drawDeclinationLines(draw, args):
             point = get_coords(r - .025, de, args)
             point2 = get_coords(r + .025, de, args)
             if point and point2 and prev:
-                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray, width=args.tick_width)
+                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=coordinates, width=args.tick_width)
                 
             prev = point2
             r += 1
@@ -670,11 +670,11 @@ def drawRaLines(draw, args):
         for de in range(sdec, edec, 1):
             point = get_coords(float(r), float(de), args)
             if point and prev:
-                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=gray, width=args.tick_width)
+                draw.line([(prev['x'], prev['y']), (point['x'], point['y'])], fill=coordinates, width=args.tick_width)
                 if de % label_step == 0:
                     rh = math.trunc(r)
                     rm = math.trunc(60 * (r - math.trunc(r)))
-                    draw.text((point['x'] + 10, point['y'] + 10), u'%s\u00b0' % (de), font=arial, fill=gray, width=args.tick_width)
+                    draw.text((point['x'] + 10, point['y'] + 10), u'%s\u00b0' % (de), font=arial, fill=coordinates, width=args.tick_width)
             prev = point
         counter += 1
         r += Decimal(1)
@@ -688,7 +688,7 @@ def drawRaLines(draw, args):
             point = get_coords(float(r), float(de - step), args)
             point2 = get_coords(float(r), float(de + step), args)
             if point and point2:
-                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=gray, width=args.tick_width)
+                draw.line([(point['x'], point['y']), (point2['x'], point2['y'])], fill=coordinates, width=args.tick_width)
             #prev = point2
         counter += 1
         r += ONE_TWELFTH
