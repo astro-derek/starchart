@@ -55,6 +55,7 @@ chi = re.compile(r'.*Chi')
 psi = re.compile(r'.*Psi')
 ome = re.compile(r'.*Ome')
 
+
 c_prog = 0
 fifteen = float(15)
 scale = float('.75')
@@ -392,6 +393,7 @@ def draw(data, ngc, args):
     if args.labels:
         drawLabels(chart, image, ngc, data, args)
         
+    
     console('finished drawing.')
     return image
 
@@ -424,7 +426,7 @@ def drawStars(chart, data, args):
         y1 = point['y'] + m * args.scaleR
         
         chart.ellipse((x, y, x1, y1), fill=black)
-        chart.ellipse((x, y, x1, y1), outline=white)
+        # chart.ellipse((x, y, x1, y1), outline=white)
         prox = row['prox']
         if prox != '999' and m > 1:
             cy = y + ((y1 - y) / 2)
@@ -461,12 +463,16 @@ def drawLabels(chart, image, ngc, data, args):
                     chart.text((point['x'], point['y']+9), name, font=font_family, fill=label)
         counter += 1
         progress(counter, len(ngc))
+    
+    # chart.text((20, 20), 'Copyright 2020, Derek Potter', font=con_font, fill=orange)
         
 def drawEcliptic(chart, args):
     coseps = math.cos(rads*23.439)
     sineps = math.sin(rads*23.439)
     prev = None
-    for d in range(0, 361):
+    for d in range(270, 520):
+        
+        console('%s' % (d))
         i = float(d) / 15
         delta = math.asin(sineps * math.sin(i*rads*15))*(180/math.pi)
         point = get_coords(i, delta, args)
@@ -524,13 +530,13 @@ def drawRAFigures(draw, args):
     count = 0
     for row in lines:
         start = get_coords(row['startRa'], row['startDec'], args)
-        if row['startRa'] > args.ra-3 and row['endRa'] < args.ra+3:
-            if start != None:
-                end = get_coords(row['endRa'], row['endDec'], args)
-                if end != None:
-                    draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=constellations, width=args.figure_line_width)
-            count += 1
-            progress(count, len(lines))
+        # if row['startRa'] > args.ra-3 and row['endRa'] < args.ra+3:
+        if start != None:
+            end = get_coords(row['endRa'], row['endDec'], args)
+            if end != None:
+                draw.line([(start['x'], start['y']), (end['x'], end['y'])], fill=constellations, width=args.figure_line_width)
+        count += 1
+        progress(count, len(lines))
 
 #def drawFigures2(draw, args):
 #    current = ''
@@ -611,6 +617,9 @@ def drawDeclinationLines(draw, args):
             
             if ctr % label_step == 0:
                 rh = round(r, 0)
+                if rh < 0:
+                    rh = 24 - rh
+
                 #rm = round(60 * (r - math.trunc(r)))
                 draw.text((point['x'] + 10, point['y'] - 35), u'%sh' % (rh), font=arial, fill=coordinates, width=args.tick_width)
             r += float(ONE_TWELFTH)
@@ -866,20 +875,20 @@ def fix(name):
     return name
     
 def calc_rad(mag):
-    if mag >= 12:
-        return .5
+    if mag >= 11:
+        return 1
     if mag >= 10:
-        return .5
+        return 1.25
     if mag >= 9:
-        return .5
+        return 1.5
     if mag >= 8:
-        return 1
+        return 1.75
     if mag >= 7:
-        return 1
+        return 2
     if mag >= 6:
-        return 2
+        return 2.25
     if mag >= 5:
-        return 2
+        return 2.5
     if mag >= 4:
         return 3
     if mag >= 3:
