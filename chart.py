@@ -12,6 +12,7 @@ args = None
 
 a4_width = 8.27
 a4_height = 11.69
+ONE_TWELFTH = 1/12
 
 TYC = 0
 HIP = 1
@@ -140,7 +141,7 @@ def main(params):
     if params == None:
         params = sys.argv
         
-    print params
+    print(params)
     args = parser.parse_args(params)
     console('%s' % (args))
     
@@ -167,7 +168,7 @@ def main(params):
         args.height = args.width
         
     image = create_chart(args)
-    print 'image done'
+    print('image done')
     if args.out:
         image.save(args.out, 'PNG')
     else:
@@ -229,7 +230,7 @@ def query(args):
         count += 1
         
         if str(line[0] + line[1]).upper() == args.query.upper():# or str('|'.join(line[24:])).upper().find(args.query.upper()) != -1 or str(line[7]).upper() == args.query.upper():
-            print '%s %s ' % (line[16], args.ngc_max)
+            print('%s %s ' % (line[16], args.ngc_max))
             if line[16] and float(line[16]) <= args.ngc_max:
                 results.append(line)
                 if args.process:
@@ -381,7 +382,7 @@ def draw(data, ngc, args):
         if args.type == 'polar':
             drawPolarFigures(chart, args)
         elif args.type == 'stereo':
-		    drawRAFigures(chart, args)
+            drawRAFigures(chart, args)
     
     drawEcliptic(chart, args)
     
@@ -586,17 +587,16 @@ def drawNames(draw, args):
         count += 1
         progress(count, len(names))
 
-ONE_TWELFTH = Decimal(1)/Decimal(12)
 def drawDeclinationLines(draw, args):
     prev = None
     decs = 0
     label_step = 12
-    dec = Decimal(-90)
-    end = Decimal(90)
-    step = Decimal(10)
+    dec = -90
+    end = 90
+    step = 10
     if args.type == 'stereo':
-        dec = Decimal(-60)
-        end = Decimal(61)
+        dec = -60
+        end = 61
         ra = args.ra - 3
         endra = args.ra + 3.05
     elif args.type == 'gnomonic':
@@ -639,8 +639,8 @@ def drawDeclinationLines(draw, args):
                     rh = 24 + rh
 
                 #rm = round(60 * (r - math.trunc(r)))
-                if rh != 24:
-                    draw.text((point['x'] + 10, point['y'] - 35), u'%sh' % (rh), font=arial, fill=coordinates, width=args.tick_width)
+                #if rh != 24:
+                #    draw.text((point['x'] + 10, point['y'] - 35), u'%sh' % (rh), font=arial, fill=coordinates, width=args.tick_width)
             r += float(ONE_TWELFTH)
             ctr += 1
             prev = point
@@ -667,28 +667,28 @@ def drawRaLines(draw, args):
     prev = None
     counter = 0
     ra = 0
-    end = Decimal(24)
-    step = Decimal('0.2')
+    end = 24
+    step = 0.2
     label_step = 10
     
     if args.type == 'stereo':
-        ra = Decimal(args.ra - 3)
-        end = Decimal(args.ra + 3)
-        sdec = Decimal(-60)
-        edec = Decimal(61)
+        ra = args.ra - 3
+        end = args.ra + 3
+        sdec = -60
+        edec = 61
     elif args.type == 'gnomonic':
-        ra = Decimal(args.ra - 1)
-        end = Decimal(args.ra + 1)
-        sdec = Decimal(args.dec - 20)
-        edec = Decimal(args.dec + 20)
+        ra = args.ra - 1
+        end = args.ra + 1
+        sdec = args.dec - 20
+        edec = args.dec + 20
         label_step = 1
     elif args.type == 'polar':
         if args.dec == 90:
-            sdec = Decimal(50)
-            edec = Decimal(81)
+            sdec = 50
+            edec = 81
         elif args.dec == -90:
-            sdec = Decimal(-80)
-            edec = Decimal(-49)
+            sdec = Decimal-80
+            edec = -49
     
     count = end - ra
     r = ra
@@ -705,7 +705,7 @@ def drawRaLines(draw, args):
                     draw.text((point['x'] + 10, point['y'] + 10), u'%s\u00b0' % (de), font=arial, fill=coordinates, width=args.tick_width)
             prev = point
         counter += 1
-        r += Decimal(1)
+        r += 1
     
     counter = 0
     r = ra
@@ -888,33 +888,33 @@ def fix(name):
 def calc_rad(mag):
     if mag >= 12:
         return .5
-    if mag >= 11:
+    elif mag >= 11:
         return .75
-    if mag >= 10:
+    elif mag >= 10:
         return 1
-    if mag >= 9:
+    elif mag >= 9:
         return 1.25
-    if mag >= 8:
+    elif mag >= 8:
         return 1.5
-    if mag >= 7:
+    elif mag >= 7:
         return 1.75
-    if mag >= 6:
+    elif mag >= 6:
         return 2
-    if mag >= 5:
+    elif mag >= 5:
         return 2.5
-    if mag >= 4:
+    elif mag >= 4:
         return 3
-    if mag >= 3:
+    elif mag >= 3:
         return 4
-    if mag >= 2:
+    elif mag >= 2:
         return 5
-    if mag >= 1:
+    elif mag >= 1:
         return 6
-    if mag >= 0:
+    elif mag >= 0:
         return 7
-    if mag >= -1:
+    elif mag >= -1:
         return 8
-    if mag >= -2:
+    else:
         return 10
 
 def get_ngc(args):
